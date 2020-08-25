@@ -1,5 +1,5 @@
 const express = require("express");
-const ArticlesService = require("./articles-service");
+const ArticlesService = require("./notes-service");
 const xss = require("xss");
 const articlesRouter = express.Router();
 const jsonParser = express.json();
