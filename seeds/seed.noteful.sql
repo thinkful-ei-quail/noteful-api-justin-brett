@@ -14,5 +14,4 @@ VALUES
   (2, 'folder 2'),
   (3, 'folder 3');
 
-
-  psql -U postgres -d noteful -f ./seeds/seed.noteful.sql
+  
