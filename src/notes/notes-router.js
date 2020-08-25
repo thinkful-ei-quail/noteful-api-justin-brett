@@ -1,10 +1,9 @@
-const path = require("path");
 const express = require("express");
-const xss = require("xss");
 const NotesService = require("./notes-service");
-
+const xss = require("xss");
 const notesRouter = express.Router();
 const jsonParser = express.json();
+const path = require("path");
 
 const serializeNotes = (notes) => ({
   notes_id: notes.notes_id,
@@ -26,21 +25,21 @@ notesRouter
   })
   .post(jsonParser, (req, res, next) => {
     const { notes_name, notes_content, folders_id } = req.body;
-    const newNotes = { notes_name, note_content, folders_id };
+    const newNotes = { notes_name, notes_content, folders_id };
 
     for (const [key, value] of Object.entries(newNotes))
       if (value == null)
         return res.status(400).json({
           error: { message: `Missing '${key}' in request body` },
         });
-
+         
     newNotes.date_published = date_published;
 
     NotesService.insertNotes(req.app.get("db"), newNotes)
       .then((notes) => {
         res
           .status(201)
-          .location(path.posix.join(req.originalUrl, `/${notes.id}`))
+          .location(path.posix.join(req.originalUrl, `/${notes.notes_id}`))
           .json(serializeNotes(notes));
       })
       .catch(next);
