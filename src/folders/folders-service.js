@@ -1,37 +1,27 @@
-const CommentsService = {
-  getAllComments(knex) {
-    return knex.select('*').from('blogful_comments')
+const ArticlesService = {
+  getAllArticles(knex) {
+    // return Promise.resolve('all the articles');
+    return knex.select('*').from('blogful_articles');
   },
-
-  insertComment(knex, newComment) {
+  insertArticle(knex, newArticle) {
+    // return Promise.resolve({});
     return knex
-      .insert(newComment)
-      .into('blogful_comments')
+      .insert(newArticle)
+      .into('blogful_articles')
       .returning('*')
-      .then(rows => {
-        return rows[0]
-      })
+      .then((rows) => {
+        return rows[0];
+      });
   },
-
   getById(knex, id) {
-    return knex
-      .from('blogful_comments')
-      .select('*')
-      .where('id', id)
-      .first()
+    return knex.from('blogful_articles').select('*').where('id', id).first();
   },
-
-  deleteComment(knex, id) {
-    return knex('blogful_comments')
-      .where({ id })
-      .delete()
+  deleteArticle(knex, id) {
+    return knex('blogful_articles').where({ id }).delete();
   },
-
-  updateComment(knex, id, newCommentFields) {
-    return knex('blogful_comments')
-      .where({ id })
-      .update(newCommentFields)
+  updateArticle(knex, id, newArticleFields) {
+    return knex('blogful_articles').where({ id }).update(newArticleFields);
   },
-}
+};
 
-module.exports = CommentsService
+module.exports = ArticlesService;

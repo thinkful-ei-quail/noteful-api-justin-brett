@@ -1,51 +1,98 @@
+const path = require("path");
 const express = require("express");
-const ArticlesService = require("./notes-service");
 const xss = require("xss");
-const articlesRouter = express.Router();
+const NotesService = require("./notes-service");
+
+const notesRouter = express.Router();
 const jsonParser = express.json();
 
-articlesRouter
+const serializeNotes = (notes) => ({
+  notes_id: notes.notes_id,
+  notes_name: notes.notes_name,
+  notes_content: xss(notes.notes_content),
+  date_published: notes.date_published,
+  folders_id: notes.folders_id,
+});
+
+notesRouter
   .route("/")
   .get((req, res, next) => {
-    ArticlesService.getAllArticles(req.app.get("db"))
-      .then((articles) => {
-        res.json(articles);
+    const knexInstance = req.app.get("db");
+    NotesService.getAllNotes(knexInstance)
+      .then((notes) => {
+        res.json(notes.map(serializeNotes));
       })
       .catch(next);
   })
   .post(jsonParser, (req, res, next) => {
-    const { title, content, style } = req.body;
-    const newArticle = { title, content, style };
-    ArticlesService.insertArticle(req.app.get("db"), newArticle)
-      .then((article) => {
-        res.status(201).location(`/articles/${article.id}`).json(article);
+    const { notes_name, notes_content, folders_id } = req.body;
+    const newNotes = { notes_name, note_content, foldres_id };
+
+    for (const [key, value] of Object.entries(newNotes))
+      if (value == null)
+        return res.status(400).json({
+          error: { message: `Missing '${key}' in request body` },
+        });
+
+    newNotes.date_published = date_published;
+
+    NotesService.insertNotes(req.app.get("db"), newNotes)
+      .then((notes) => {
+        res
+          .status(201)
+          .location(path.posix.join(req.originalUrl, `/${notes.id}`))
+          .json(serializeNotes(notes));
       })
       .catch(next);
   });
 
-articlesRouter
-  .route("/:article_id")
+notesRouter
+  .route("/:notes_id")
   .all((req, res, next) => {
-    ArticlesService.getById(req.app.get("db"), req.params.article_id)
-      .then((article) => {
-        if (!article) {
+    NotesService.getById(req.app.get("db"), req.params.notes_id)
+      .then((notes) => {
+        if (!notes) {
           return res.status(404).json({
-            error: { message: `Article doesn't exist` },
+            error: { message: `notes doesn't exist` },
           });
         }
-        res.article = article; // save the article for the next middleware
-        next(); // don't forget to call next so the next middleware happens!
+        res.notes = notes;
+        next();
       })
       .catch(next);
   })
   .get((req, res, next) => {
-    res.json({
-      id: res.article.id,
-      style: res.article.style,
-      title: xss(res.article.title), // sanitize title
-      content: xss(res.article.content), // sanitize content
-      date_published: res.article.date_published,
-    });
+    res.json(serializeNotes(res.notes));
+  })
+  .delete((req, res, next) => {
+    NotesService.deleteNotes(req.app.get("db"), req.params.notes_id)
+      .then((numRowsAffected) => {
+        res.status(204).end();
+      })
+      .catch(next);
+  })
+  .patch(jsonParser, (req, res, next) => {
+    const { text, date_published } = req.body;
+    const notesToUpdate = { text, date_published };
+
+    const numberOfValues = Object.values(notesToUpdate).filter(Boolean)
+      .length;
+    if (numberOfValues === 0)
+      return res.status(400).json({
+        error: {
+          message: `Request body must contain either 'text' or 'date_published'`,
+        },
+      });
+
+    NotesService.updateNotes(
+      req.app.get("db"),
+      req.params.notes_id,
+      notesToUpdate
+    )
+      .then((numRowsAffected) => {
+        res.status(204).end();
+      })
+      .catch(next);
   });
 
-module.exports = articlesRouter;
+module.exports = notesRouter;
