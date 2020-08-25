@@ -1,12 +1,12 @@
-const CommentsService = {
-  getAllComments(knex) {
-    return knex.select('*').from('blogful_comments')
+const NotesService = {
+  getAllNotes(knex) {
+    return knex.select('*').from('notes')
   },
 
-  insertComment(knex, newComment) {
+  insertNotes(knex, newNotes) {
     return knex
-      .insert(newComment)
-      .into('blogful_comments')
+      .insert(newNotes)
+      .into('notes')
       .returning('*')
       .then(rows => {
         return rows[0]
@@ -15,23 +15,23 @@ const CommentsService = {
 
   getById(knex, id) {
     return knex
-      .from('blogful_comments')
+      .from('notes')
       .select('*')
       .where('id', id)
       .first()
   },
 
-  deleteComment(knex, id) {
-    return knex('blogful_comments')
+  deleteNotes(knex, id) {
+    return knex('notes')
       .where({ id })
       .delete()
   },
 
-  updateComment(knex, id, newCommentFields) {
-    return knex('blogful_comments')
+  updateNotes(knex, id, newNotesFields) {
+    return knex('notes')
       .where({ id })
-      .update(newCommentFields)
+      .update(newNotesFields)
   },
 }
 
-module.exports = CommentsService
+module.exports = NotesService

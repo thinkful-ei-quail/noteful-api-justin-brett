@@ -1,27 +1,26 @@
-const ArticlesService = {
-  getAllArticles(knex) {
-    // return Promise.resolve('all the articles');
-    return knex.select('*').from('blogful_articles');
+const FoldersService = {
+  getAllFolders(knex) {
+      return knex.select('*').from('folders');
   },
-  insertArticle(knex, newArticle) {
+  insertFolders(knex, newFolders) {
     // return Promise.resolve({});
     return knex
-      .insert(newArticle)
-      .into('blogful_articles')
+      .insert(newFolders)
+      .into("folders")
       .returning('*')
       .then((rows) => {
         return rows[0];
       });
   },
-  getById(knex, id) {
-    return knex.from('blogful_articles').select('*').where('id', id).first();
+  getById(knex, folders_id) {
+    return knex.from('folders').select('*').where('folders_id', folders_id).first();
   },
-  deleteArticle(knex, id) {
-    return knex('blogful_articles').where({ id }).delete();
+  deleteFolders(knex, folders_id) {
+    return knex('folders').where({ folders_id }).delete();
   },
-  updateArticle(knex, id, newArticleFields) {
-    return knex('blogful_articles').where({ id }).update(newArticleFields);
+  updateFolders(knex, folders_id, newFoldersFields) {
+    return knex('folders').where({ folders_id }).update(newFoldersFields);
   },
 };
 
-module.exports = ArticlesService;
+module.exports = FoldersService;
