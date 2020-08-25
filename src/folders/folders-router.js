@@ -14,10 +14,10 @@ foldersRouter
       .catch(next);
   })
   .post(jsonParser, (req, res, next) => {
-    const { title, content, style } = req.body;
-    const newFolders = { title, content, style };
+    const { folders_name} = req.body;
+    const newFolders = { folders_name };
     FoldersService.insertFolders(req.app.get("db"), newFolders)
-      .then((folders) => {
+        .then((folders) => {
         res.status(201).location(`/folders/${folders.folders_id}`).json(folders);
       })
       .catch(next);

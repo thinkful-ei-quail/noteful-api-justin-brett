@@ -32,8 +32,6 @@ notesRouter
         return res.status(400).json({
           error: { message: `Missing '${key}' in request body` },
         });
-         
-    newNotes.date_published = date_published;
 
     NotesService.insertNotes(req.app.get("db"), newNotes)
       .then((notes) => {
@@ -71,15 +69,14 @@ notesRouter
       .catch(next);
   })
   .patch(jsonParser, (req, res, next) => {
-    const { text, date_published } = req.body;
-    const notesToUpdate = { text, date_published };
+    const { notes_name, notes_content, folders_id } = req.body;
+    const notesToUpdate = { notes_name, notes_content, folders_id };
 
-    const numberOfValues = Object.values(notesToUpdate).filter(Boolean)
-      .length;
+    const numberOfValues = Object.values(notesToUpdate).filter(Boolean).length;
     if (numberOfValues === 0)
       return res.status(400).json({
         error: {
-          message: `Request body must contain either 'text' or 'date_published'`,
+          message: `Request body must contain either name or content'`,
         },
       });
 
