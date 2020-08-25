@@ -17,6 +17,9 @@
     "expect": true
   },
   "keywords": [],
+  "engines": {
+    "node": "12.18.3"
+  },
   "author": "",
   "license": "ISC",
   "dependencies": {
